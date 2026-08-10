@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fatma'ya Özel 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', sans-serif; background-color: #2c2420; overflow-x: hidden; min-height: 100vh; }
+    
+    .stage { display: none; width: 100vw; min-height: 100vh; justify-content: center; align-items: center; position: relative; }
+    .stage.active { display: flex; }
+    
+    /* STAGE 1: ZARF */
+    #envelope-stage { background: #3a2e2b; }
+    .envelope-container { cursor: pointer; }
+    .envelope { width: 280px; height: 180px; background: #d7c4a1; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative; border: 2px solid #b8a37e; display: flex; justify-content: center; align-items: center; transition: transform 0.3s; }
+    .envelope:hover { transform: scale(1.05); }
+    .stamp { position: absolute; top: 15px; right: 15px; font-size: 24px; border: 2px dashed #a07a50; padding: 4px; }
+    .click-hint { font-family: 'Caveat', cursive; font-size: 2.2rem; color: #5c4428; font-weight: bold; background: rgba(255, 255, 255, 0.4); padding: 5px 20px; border-radius: 20px; }
+    
+    /* STAGE 2: MEKTUP */
+    #letter-stage { background: #2b221e; }
+    .letter-paper { background: #f4ead5; background-image: radial-gradient(#e5d3b3 10%, transparent 11%); background-size: 20px 20px; width: 90%; max-width: 550px; padding: 40px; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.7), inset 0 0 80px rgba(139, 90, 43, 0.3); border: 1px solid #d4c19c; position: relative; }
+    .letter-content { font-family: 'Caveat', cursive; font-size: 1.75rem; font-style: italic; color: #3d2b1f; line-height: 1.6; }
+    .next-arrow-container { margin-top: 30px; display: flex; align-items: center; justify-content: flex-end; cursor: pointer; color: #7a2020; font-weight: bold; }
+    .next-arrow-container:hover { color: #d63384; }
+    .arrow-text { margin-right: 8px; font-size: 1rem; }
+    .arrow { font-size: 1.5rem; }
+    
+    /* STAGE 3: BAHÇE VE 3D PONY'LER */
+    #garden-stage { 
+      background: linear-gradient(180deg, #ffdde1 0%, #ee9ca7 100%); 
+      background-image: radial-gradient(#ffb6c1 20%, transparent 20%), radial-gradient(#ff69b4 20%, transparent 20%); 
+      background-size: 50px 50px; 
+      padding: 40px 10px; 
+      flex-direction: column;
+    }
+    .garden-container { width: 100%; max-width: 900px; text-align: center; }
+    .garden-title { color: #8b0042; font-size: 2rem; margin-bottom: 15px; text-shadow: 1px 1px 2px white; }
+    .speech-bubble { background: #ffffff; color: #d63384; border: 3px solid #ff69b4; border-radius: 20px; padding: 15px 25px; max-width: 600px; margin: 0 auto 25px auto; font-size: 1.1rem; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+    .speech-bubble.hidden { display: none; }
+    
+    .ponies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 20px; margin-top: 20px; perspective: 1000px; }
+    .pony-card { 
+      background: linear-gradient(145deg, #ffffff, #ffe4e1); 
+      border: 2px solid #ffb6c1; 
+      border-radius: 20px; 
+      padding: 15px; 
+      cursor: pointer; 
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 2px 5px rgba(255,255,255,0.8); 
+      transform: style 3d; 
+      transition: all 0.4s ease; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+    }
+    .pony-card:hover { transform: translateY(-10px) rotateX(10deg) rotateY(10deg) scale(1.08); box-shadow: 0 15px 30px rgba(255, 105, 180, 0.4); }
+    .pony-card img { width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.3)); }
+    .pony-card span { margin-top: 10px; font-size: 0.9rem; font-weight: 600; color: #5a002c; }
+    
+    /* MODAL VE UÇAN MIA */
+    .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    .modal.hidden { display: none; }
+    .modal-content { background: #fff0f5; border: 4px solid #ff1493; border-radius: 25px; padding: 30px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+    
+    /* Mia Kanat Çırpma Efekti */
+    .mia-img { 
+      width: 150px; 
+      height: 150px; 
+      object-fit: contain; 
+      margin-bottom: 15px; 
+      animation: floatAndFlap 2s infinite ease-in-out; 
+    }
+    @keyframes floatAndFlap {
+      0% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-15px) scale(1.05) rotate(2deg); }
+      100% { transform: translateY(0px) scale(1); }
+    }
+    
+    .mia-speech { color: #8b0042; font-size: 1rem; font-weight: bold; line-height: 1.6; margin-bottom: 20px; }
+    .modal-content button { background: #ff1493; color: white; border: none; padding: 12px 28px; font-size: 1rem; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    .modal-content button:hover { background: #c71585; transform: scale(1.05); }
+
+    /* STAGE 4: YOL VE RAPUNZEL */
+    #path-stage {
+      background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop') center/cover;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .path-instruction {
+      position: absolute;
+      top: 30px;
+      background: rgba(255,255,255,0.85);
+      color: #4a0e17;
+      padding: 10px 25px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .rapunzel-container {
+      display: none;
+      background: rgba(255, 240, 245, 0.95);
+      border: 4px solid #dda0dd;
+      border-radius: 25px;
+      padding: 30px;
+      max-width: 550px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      animation: fadeIn 1s ease-in;
+    }
+    .rapunzel-img {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+    }
+    .rapunzel-speech { color: #4a0e17; font-size: 0.95rem; font-weight: 600; line-height: 1.6; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- SES DOSYALARI -->
+  <audio id="paperSound" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3"></audio>
+  <!-- Healing Incantation -->
+  <audio id="bgMusic" loop src="https://ia800503.us.archive.org/15/items/healing-incantation-tangled-ost/Healing%20Incantation%20-%20Tangled%20OST.mp3"></audio>
+  <!-- My Little Pony Theme Song -->
+  <audio id="mlpMusic" loop src="https://ia600902.us.archive.org/29/items/MyLittlePonyThemeSong/My%20Little%20Pony%20Theme%20Song.mp3"></audio>
+
+  <!-- STAGE 1: MEKTUP ZARFI -->
+  <div id="envelope-stage" class="stage active">
+    <div class="envelope-container" onclick="openLetter()">
+      <div class="envelope">
+        <div class="stamp">❤️</div>
+        <div class="click-hint">BAS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 2: ESKİ MEKTUP KAĞIDI -->
+  <div id="letter-stage" class="stage">
+    <div class="letter-paper">
+      <div class="letter-content">
+        Sevgilim nasılsın ,<br><br>
+        Biliyorum konuşmak istemiyorsun benimle hata yaptım esseklik ettim ben seni cok seviyorum çok ama çok sadece seninle konusup seninle barışmak istiyorum seninle eskisi gibi konuşmak istiyorum seni çok ama çok seviyorummm
+      </div>
+      <div class="next-arrow-container" onclick="goToGarden()">
+        <span class="arrow-text">Üstüne Tıkla</span>
+        <span class="arrow">➔</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: PEMBE ÇİÇEKLİ BAHÇE VE PONY'LER -->
+  <div id="garden-stage" class="stage">
+    <div class="garden-container">
+      <h2 class="garden-title">🌸 Çiçekli Bahçe 🌸</h2>
+      <div id="speech-bubble" class="speech-bubble hidden"></div>
+      
+      <div class="ponies-grid">
+        <div class="pony-card" onclick="handlePonyClick('Fluttershy')">
+          <img src="https://pngimg.com/uploads/my_little_pony/my_little_pony_PNG26.png" alt="Fluttershy">
+          <span>Fluttershy</span>
+        </div>
+        <div class="pony-card" onclick="handlePonyClick('Twilight Sparkle')">
+          <img src="https://pngimg.com/uploads/my_little_pony/my_little_pony_PNG38.png" alt="Twilight Sparkle">
+          <span>Twilight Sparkle</span>
+        </div>
+        <div class="pony-card" onclick="handlePonyClick('Rainbow Dash')">
+          <img src="https://pngimg.com/uploads/my_little_pony/my_little_pony_PNG18.png" alt="Rainbow Dash">
+          <span>Rainbow Dash</span>
+        </div>
+        <div class="pony-card" onclick="handlePonyClick('Pinkie Pie')">
+          <img src="https://pngimg.com/uploads/my_little_pony/my_little_pony_PNG46.png" alt="Pinkie Pie">
+          <span>Pinkie Pie</span>
+        </div>
+        <div class="pony-card" onclick="handlePonyClick('Rarity')">
+          <img src="https://pngimg.com/uploads/my_little_pony/my_little_pony_PNG52.png" alt="Rarity">
+          <span>Rarity</span>
+        </div>
+        <div class="pony-card" onclick="handlePonyClick('Applejack')">
+          <img src="https://pngimg.com/uploads/my_little_pony/my_little_pony_PNG35.png" alt="Applejack">
+          <span>Applejack</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIA MODAL (POPUP) -->
+  <div id="mia-modal" class="modal hidden">
+    <div class="modal-content">
+      <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3c05423f-e5ee-449e-b7d1-e633d3e6ba1f/ddv1mfa-c211516e-4b36-4700-aa4d-8ef38cebc3fb.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" alt="Mia" class="mia-img">
+      <div class="mia-speech">
+        "Fatmaa merhabaaa nasılsınnn ayni benim gibi olduğunu biliyorumm hissettim diyelim biliyon muu ben hep seninle tanışmayı istedim belkide buna şehmus vesile oldu sende onu çok seviyorsun demi eğer oyleyse bu güzel konuşmamızın sonunda ona onu sevdiğini soyle olurmu bende seni seviyorum mamiş"
+      </div>
+      <button onclick="goToPathStage()">Yola Devam Et ✨</button>
+    </div>
+  </div>
+
+  <!-- STAGE 4: ÇİÇEKLİ TAŞLI YOL VE RAPUNZEL -->
+  <div id="path-stage" class="stage" onclick="handlePathClick()">
+    <div id="path-instruction" class="path-instruction">Yolda ilerlemek için ekrana tıkla... (1)</div>
+    
+    <div id="rapunzel-card" class="rapunzel-container">
+      <img src="https://pngimg.com/uploads/rapunzel/rapunzel_PNG43.png" alt="Rapunzel" class="rapunzel-img">
+      <div class="rapunzel-speech">
+        "aaa sen mi geldin nasılsın iyimisin burdan birlikte ışıkları izlemeye mi gidicez a sen konuşmaya geldin konuşalım nasılsınn biliyorum biraz ağrın var ama endişelenme bunların hepsini atlatacaksın hiç sıkma canını bu süreçte hepimiz yanındayız hem daha seninle konusmak isteyen başka arkadaşlarımız da var hepimiz seninle tanışmak için can atıyoruz kendine iyi bak daha sonra görüşmek dileğiylee 💖"
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ponyClickCount = 0;
+    let pathClickCount = 0;
+
+    // 1. MEKTUP AÇILIŞI (Healing Incantation Başlar)
+    function openLetter() {
+      const paperSound = document.getElementById('paperSound');
+      if (paperSound) paperSound.play().catch(() => {});
+
+      const bgMusic = document.getElementById('bgMusic');
+      if (bgMusic) {
+        bgMusic.volume = 0.8;
+        bgMusic.play().catch(err => console.log("Müzik çalma engeli:", err));
+      }
+
+      document.getElementById('envelope-stage').classList.remove('active');
+      document.getElementById('letter-stage').classList.add('active');
+    }
+
+    // 2. BAHÇEYE GEÇİŞ (Healing Incantation Durur)
+    function goToGarden() {
+      const bgMusic = document.getElementById('bgMusic');
+      if (bgMusic) {
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+      }
+
+      document.getElementById('letter-stage').classList.remove('active');
+      document.getElementById('garden-stage').classList.add('active');
+    }
+
+    // 3. PONY TIKLAMA (My Little Pony Müzik Başlar + Özel Konuşmalar)
+    function handlePonyClick(ponyName) {
+      // My Little Pony müziğini çal
+      const mlpMusic = document.getElementById('mlpMusic');
+      if (mlpMusic && mlpMusic.paused) {
+        mlpMusic.volume = 0.6;
+        mlpMusic.play().catch(() => {});
+      }
+
+      const speechBubble = document.getElementById('speech-bubble');
+      speechBubble.classList.remove('hidden');
+      ponyClickCount++;
+
+      if (ponyName === 'Fluttershy' || ponyClickCount === 1) {
+        speechBubble.innerHTML = `<span style="color: #ff1493;">🌸 Fluttershy:</span> "Şemus seni çok seviyor! Bizi sevdiğini biliyoruz en çok da beni sanırım su senin essek de seni cok seviyor eger bu cabasi hosuna gittiyse konusursun ki senn hem o kaç gundur seni çok seviyor"`;
+      } else if (ponyClickCount === 2) {
+        speechBubble.innerHTML = `<span style="color: #ff1493;">🌸 ${ponyName}:</span> "Şemus seni çok seviyor! Sana bir sürprizimiz daha var, tekrar tıkla... 💕"`;
+      } else {
+        speechBubble.innerHTML = `<span style="color: #ff1493;">🌸 ${ponyName}:</span> "Bak sana kim uçarak geldi!"`;
+        setTimeout(() => { showMiaModal(); }, 500);
+      }
+    }
+
+    // 4. MIA POPUP
+    function showMiaModal() {
+      document.getElementById('mia-modal').classList.remove('hidden');
+    }
+
+    // 5. YOLA GEÇİŞ
+    function goToPathStage() {
+      document.getElementById('mia-modal').classList.add('hidden');
+      document.getElementById('garden-stage').classList.remove('active');
+      document.getElementById('path-stage').classList.add('active');
+    }
+
+    // 6. YOLDA İLERLEME VE RAPUNZEL
+    function handlePathClick() {
+      pathClickCount++;
+      const instruction = document.getElementById('path-instruction');
+
+      if (pathClickCount === 1) {
+        instruction.innerText = "Yolun sonuna az kaldı, bir kez daha tıkla... (2)";
+      } else if (pathClickCount >= 2) {
+        instruction.style.display = 'none';
+        document.getElementById('rapunzel-card').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
